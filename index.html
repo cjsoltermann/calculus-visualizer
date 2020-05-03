@@ -2,10 +2,7 @@
     <head>
         <title>Calculus Rotation and Cross Section Visualizer</title>
         <link rel="stylesheet" type="text/css" href="style.css">
-        <script src="https://cdn.jsdelivr.net/combine/npm/three@0.115.0,npm/three@0.115.0/examples/js/controls/OrbitControls.min.js,npm/three@0.115.0/examples/js/controls/TrackballControls.min.js"></script>
-        <script type="text/javascript" src="dat.gui.min.js"></script>
-        <script src="parser.js"></script>
-        <script type="module" src="visualizer.js"></script>
+        <script type="module" src="build/bundle.js"></script>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
@@ -14,8 +11,8 @@
             <h1>Calculus Visualizer</h1>
             <h2>Tools</h2>
             <ul>
-                <li><button onClick="rotation.load()">Solids of Revolution</button></li>
-                <li><button onClick="crossSection.load()">Solids of Known Cross Section</button></li>
+                <li><button onClick="loadRotation()">Solids of Revolution</button></li>
+                <li><button onClick="loadCrossSection()">Solids of Known Cross Section</button></li>
             </ul>
             <div id="rotationNotes">
                 <h2>Notes</h2>
