@@ -55303,7 +55303,6 @@
 
 	//TODO: Either use a webworker or timeouts to keep the frame from freezing up
 	//TODO: Stop using the lathe primitive and manually create geometry
-	//TODO: Don't regenerate shape to remove caps
 	//TODO: Multiple curves, use subtraction
 	function solidOfRevolution(curve, axis) {
 	    var curveFunc = parseFunction(curve);
@@ -55453,7 +55452,10 @@
 	    });
 
 	    // guiItems.drawCaps.onChange(rotation.updateShape);
-	    guiItems.step.onFinishChange(rotation.updateCurve);
+	    guiItems.step.onFinishChange(function(value){
+	        if (value <= 0) return;
+	        rotation.updateCurve();
+	    });
 	    guiItems.detail.onFinishChange(rotation.updateShape);
 
 	    guiItems.curveFunc.onFinishChange(rotation.updateCurve);

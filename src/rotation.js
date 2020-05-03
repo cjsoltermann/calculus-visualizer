@@ -190,7 +190,10 @@ rotation.setup = function() {
     });
 
     // guiItems.drawCaps.onChange(rotation.updateShape);
-    guiItems.step.onFinishChange(rotation.updateCurve);
+    guiItems.step.onFinishChange(function(value){
+        if (value <= 0) return;
+        rotation.updateCurve();
+    });
     guiItems.detail.onFinishChange(rotation.updateShape);
 
     guiItems.curveFunc.onFinishChange(rotation.updateCurve);
