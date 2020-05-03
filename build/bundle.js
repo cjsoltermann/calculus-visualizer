@@ -55339,26 +55339,25 @@
 	    var mesh = new Mesh(geometry, material);
 
 	    //Create Caps
-	    if (rotation.drawCaps)
-	    {
-	        var topRadius = transformedPoints[0].x;
-	        var bottomRadius = transformedPoints[transformedPoints.length - 1].x;
+	    var topRadius = transformedPoints[0].x;
+	    var bottomRadius = transformedPoints[transformedPoints.length - 1].x;
 
-	        if (topRadius != 0) {
-	            var topCap = new CircleGeometry(topRadius, rotation.detail, Math.PI / 2);
-	            var topMesh = new Mesh(topCap, material);
-	            topMesh.position.y = transformedPoints[0].y;
-	            topMesh.rotateOnAxis(new Vector3(1, 0, 0), Math.PI / 2);
-	            mesh.add(topMesh);
-	        }
+	    if (topRadius != 0) {
+	        var topCap = new CircleGeometry(topRadius, rotation.detail, Math.PI / 2);
+	        var topMesh = new Mesh(topCap, material);
+	        topMesh.position.y = transformedPoints[0].y;
+	        topMesh.rotateOnAxis(new Vector3(1, 0, 0), Math.PI / 2);
+	        rotation.topCap = topMesh;
+	        if (rotation.drawCaps) mesh.add(topMesh);
+	    }
 
-	        if (bottomRadius != 0) {
-	            var bottomCap = new CircleGeometry(bottomRadius, rotation.detail, Math.PI / 2);
-	            var bottomMesh = new Mesh(bottomCap, material);
-	            bottomMesh.position.y = transformedPoints[transformedPoints.length - 1].y;
-	            bottomMesh.rotateOnAxis(new Vector3(1, 0, 0), Math.PI / 2);
-	            mesh.add(bottomMesh);
-	        }
+	    if (bottomRadius != 0) {
+	        var bottomCap = new CircleGeometry(bottomRadius, rotation.detail, Math.PI / 2);
+	        var bottomMesh = new Mesh(bottomCap, material);
+	        bottomMesh.position.y = transformedPoints[transformedPoints.length - 1].y;
+	        bottomMesh.rotateOnAxis(new Vector3(1, 0, 0), Math.PI / 2);
+	        rotation.bottomCap = bottomMesh;
+	        if (rotation.drawCaps) mesh.add(bottomMesh);
 	    }
 
 	    mesh.rotateOnAxis(new Vector3(0,0,1), -angle);
@@ -55448,8 +55447,12 @@
 	    guiItems.drawBounds.onChange(function(value){
 	        toggleObject(value, rotation.scene, rotation.boundSquare);
 	    });
+	    guiItems.drawCaps.onChange(function(value){
+	        toggleObject(value, rotation.shape, rotation.topCap);
+	        toggleObject(value, rotation.shape, rotation.bottomCap);
+	    });
 
-	    guiItems.drawCaps.onChange(rotation.updateShape);
+	    // guiItems.drawCaps.onChange(rotation.updateShape);
 	    guiItems.step.onFinishChange(rotation.updateCurve);
 	    guiItems.detail.onFinishChange(rotation.updateShape);
 
