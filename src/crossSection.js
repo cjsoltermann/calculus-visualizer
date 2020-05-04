@@ -3,6 +3,47 @@ import * as dat from "../node_modules/dat.gui/build/dat.gui.module.js";
 
 import {createCamera, createOrbitControls, toggleObject, buildGui, createGrid, parseFunction, plotFunction, getFunctionPoints, createBoundSquare, updateObject} from "./common.js";
 
+const CROSS_SECTION = {
+    EQUALATERAL_TRIANGLE: 0,
+    ISOSCELES_LEG_DOWN: 1,
+    ISOSCELES_HYPOTENUSE_DOWN: 2,
+    SQUARE: 3,
+    SEMI_CIRCLE: 4,
+};
+
+const CROSS_SECTION_FUNCTIONS = [
+    //Equalateral
+    function(x) {
+        return [[x / 2, (Math.sqrt(3) / 2) * x]];
+    },
+    //Isosceles (Leg down)
+    function(x) {
+        return [[0,x]];
+    },
+    //Isosceles (Hypotenuse down)
+    function(x) {
+        return [[x/2,x/2]];
+    },
+    //Square
+    function(x) {
+        return [[0,x],[x,x]];
+    },
+    //Semi-Circle
+    function(x) {
+        var ret = [];
+        for (let i = 0; i <= crossSection.detail; i++) {
+            // Add detail points evenly spaced
+            // The height of each point is found using the function Math.sqrt(radius * x - x * x)
+            // Radius is the argument, x is the x value of the pushed point
+            ret.push([
+                x*i/crossSection.detail,
+                Math.sqrt((x * x * i / crossSection.detail) - Math.pow(x * i / crossSection.detail, 2))
+            ]);
+        }
+        return ret;
+    },
+];
+
 var crossSection = {
     controls:null,
     gui:null,
@@ -20,6 +61,7 @@ var crossSection = {
     step: 0.1,
     curveFunc:"10 * (1.1)^(-(x^2))",
     axisFunc:"x=0",
+    crossSection: CROSS_SECTION.EQUALATERAL_TRIANGLE,
     drawShape: true,
     drawCurve: true,
     drawGrid: true,
@@ -57,19 +99,18 @@ function solidOfKnownCrossSection(curve) {
         let y = curvePoints[i].y;
         geometry.vertices.push(point);
         geometry.vertices.push(new THREE.Vector3(x, 0, 0));
-        geometry.vertices.push(new THREE.Vector3(x, y / 2, (Math.sqrt(3) / 2) * y));
+        //geometry.vertices.push(new THREE.Vector3(x, y / 2, (Math.sqrt(3) / 2) * y));
+        var coords = CROSS_SECTION_FUNCTIONS[crossSection.crossSection](y);
+        for (let coord of coords) {
+            geometry.vertices.push(new THREE.Vector3(x, coord[0], coord[1]));
+        }
     }
 
-    for (let i = 0; i < geometry.vertices.length - 6; i += 3) {
-        // Bottom
-        geometry.faces.push(new THREE.Face3(i + 0, i + 3, i + 1));
-        geometry.faces.push(new THREE.Face3(i + 1, i + 3, i + 4));
-        //Curve to top
-        geometry.faces.push(new THREE.Face3(i + 0, i + 2, i + 3));
-        geometry.faces.push(new THREE.Face3(i + 2, i + 5, i + 3));
-        //Top to zero
-        geometry.faces.push(new THREE.Face3(i + 1, i + 4, i + 2));
-        geometry.faces.push(new THREE.Face3(i + 2, i + 4, i + 5));
+    var slicePointCount = CROSS_SECTION_FUNCTIONS[crossSection.crossSection](0).length + 2;
+
+    for (let i = 0; i < geometry.vertices.length - slicePointCount * 2; i += 1) {
+        geometry.faces.push(new THREE.Face3(i + 0, i + 1, i + slicePointCount));
+        geometry.faces.push(new THREE.Face3(i + slicePointCount, i + slicePointCount + 1, i + 1));
     }
 
     geometry.computeFaceNormals();
@@ -121,6 +162,15 @@ crossSection.setup = function () {
 
     var blueprint = {
         "curveFunc": "Curve",
+        "crossSection": ["Cross Section",
+            {
+                "Equalateral Triangle": 0,
+                "Isosceles Right Triangle (Leg as base)": 1,
+                "Isosceles Right Triangle (Hypotenuse as base)": 2,
+                "Square": 3,
+                "Semi-Circle": 4
+            }
+        ],
         "detail": "Detail",
         "step": "Step",
         "drawShape": "Draw Shape",
@@ -161,6 +211,7 @@ crossSection.setup = function () {
     guiItems.detail.onFinishChange(crossSection.updateShape);
 
     guiItems.curveFunc.onFinishChange(crossSection.updateCurve);
+    guiItems.crossSection.onChange(crossSection.updateShape);
 
     guiItems.Colors.shapeColor.onChange(function(value) {
         crossSection.shape.material.color.set(value);

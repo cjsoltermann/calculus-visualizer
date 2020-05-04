@@ -40,7 +40,11 @@ export function buildGui(gui, object, blueprint) {
                 ret[key] = gui.add(object, key).name(value);
         }
         else if (typeof(value) == "object") {
-            ret[key] = buildGui(gui.addFolder(key), object, value);
+            if (value[0]) {
+                ret[key] = gui.add(object, key, value[1]).name(value[0]);
+            }
+            else
+                ret[key] = buildGui(gui.addFolder(key), object, value);
         }
     }
     return ret;
