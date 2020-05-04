@@ -32,12 +32,10 @@ const CROSS_SECTION_FUNCTIONS = [
     function(x) {
         var ret = [];
         for (let i = 0; i <= crossSection.detail; i++) {
-            // Add detail points evenly spaced
-            // The height of each point is found using the function Math.sqrt(radius * x - x * x)
-            // Radius is the argument, x is the x value of the pushed point
+            let angle = i / crossSection.detail * Math.PI;
             ret.push([
-                x*i/crossSection.detail,
-                Math.sqrt((x * x * i / crossSection.detail) - Math.pow(x * i / crossSection.detail, 2))
+                x / 2 * (Math.cos(angle + Math.PI) + 1),
+                x / 2 * Math.sin(angle)
             ]);
         }
         return ret;
@@ -91,7 +89,6 @@ function solidOfKnownCrossSection(curve) {
     var curvePoints = getFunctionPoints(curveFunc, true);
     var diffPoints = getFunctionPoints(diffFunc, true);
 
-    //Equilateral triangle height = sqrt(3)/2 * x
     var geometry = new THREE.Geometry();
     for (let i = 0; i < curvePoints.length; i++) {
         let point = curvePoints[i];
@@ -99,7 +96,6 @@ function solidOfKnownCrossSection(curve) {
         let y = curvePoints[i].y;
         geometry.vertices.push(point);
         geometry.vertices.push(new THREE.Vector3(x, 0, 0));
-        //geometry.vertices.push(new THREE.Vector3(x, y / 2, (Math.sqrt(3) / 2) * y));
         var coords = CROSS_SECTION_FUNCTIONS[crossSection.crossSection](y);
         for (let coord of coords) {
             geometry.vertices.push(new THREE.Vector3(x, coord[0], coord[1]));
@@ -109,7 +105,7 @@ function solidOfKnownCrossSection(curve) {
     var slicePointCount = CROSS_SECTION_FUNCTIONS[crossSection.crossSection](0).length + 2;
 
     for (let i = 0; i < geometry.vertices.length - slicePointCount * 2; i += 1) {
-        geometry.faces.push(new THREE.Face3(i + 0, i + 1, i + slicePointCount));
+        geometry.faces.push(new THREE.Face3(i + 1, i + 0, i + slicePointCount));
         geometry.faces.push(new THREE.Face3(i + slicePointCount, i + slicePointCount + 1, i + 1));
     }
 
