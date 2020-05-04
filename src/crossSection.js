@@ -110,6 +110,8 @@ function solidOfKnownCrossSection(curve) {
     }
 
     geometry.computeFaceNormals();
+    if (crossSection.crossSection == CROSS_SECTION.SEMI_CIRCLE)
+        geometry.computeVertexNormals();
 
     var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: crossSection.shapeColor, side: THREE.DoubleSide }));
     //var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: crossSection.shapeColor, side: THREE.FrontSide }));

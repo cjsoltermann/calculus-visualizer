@@ -55630,9 +55630,11 @@
 	    }
 
 	    geometry.computeFaceNormals();
+	    if (crossSection.crossSection == CROSS_SECTION.SEMI_CIRCLE)
+	        geometry.computeVertexNormals();
 
-	    //var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: crossSection.shapeColor, side: THREE.DoubleSide }));
-	    var mesh = new Mesh(geometry, new MeshPhongMaterial({color: crossSection.shapeColor, side: FrontSide }));
+	    var mesh = new Mesh(geometry, new MeshPhongMaterial({color: crossSection.shapeColor, side: DoubleSide }));
+	    //var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: crossSection.shapeColor, side: THREE.FrontSide }));
 	    mesh.rotation.x = -Math.PI / 2;
 	    //var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: "red", side: THREE.DoubleSide }));
 	    //var mesh = new THREE.Points(geometry, new THREE.PointsMaterial( { color: 0x888888, size: 0.3 } ));
